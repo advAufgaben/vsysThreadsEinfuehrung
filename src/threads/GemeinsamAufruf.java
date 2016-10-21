@@ -14,7 +14,7 @@ public class GemeinsamAufruf {
 	
 	public static class Gemeinsam extends Thread {
 		
-		private static final String SPERRDATEI_PFAD = "/lock";
+		private static final File SPERRDATEI = new File("lock");
 		
 		public static int	zahl = 10;
 		public int			nummer;
@@ -25,55 +25,37 @@ public class GemeinsamAufruf {
 		
 		@Override
 		public void run() {
+			while(!createLockFile(SPERRDATEI)){
+				Util.sleep(50);
+			}
+			
 			int		x;
-			System.out.println("Thread Nr. " + this.nummer + ", Zahl: " + Gemeinsam.getZahl());
-			x = Gemeinsam.getZahl();
+			System.out.println("Thread Nr. " + this.nummer + ", Zahl: " + zahl);
+			x = zahl;
 			try {
 				Thread.sleep(50);
-			} catch (InterruptedException e) { }
-			Gemeinsam.setZahl(x + this.nummer);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			zahl = x + this.nummer;
 			try {
 				Thread.sleep(50);
-			} catch (InterruptedException e) { }
-			System.out.println("Thread Nr. " + this.nummer + ", Zahl: " + Gemeinsam.getZahl());
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			System.out.println("Thread Nr. " + this.nummer + ", Zahl: " + zahl);
+			
+			SPERRDATEI.delete();
 		}
 		
-		private static void createLockFile(File lock){
+		private static boolean createLockFile(File lock){
 			try {
-				lock.createNewFile();
+				return lock.createNewFile();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			return false;
 		}
-		
-		public static int getZahl() {
-			File lock = new File(SPERRDATEI_PFAD);
-			while(lock.exists()){
-				Util.sleep(50);
-			}
-			
-			createLockFile(lock);
-			
-			int readValue = zahl;
-			
-			lock.delete();
-			
-			return readValue;
-		}
-		
-		public static void setZahl(int zahl) {
-			File lock = new File(SPERRDATEI_PFAD);
-			while(lock.exists()){
-				Util.sleep(50);
-			}
-			
-			createLockFile(lock);
-			
-			Gemeinsam.zahl = zahl;
-			
-			lock.delete();
-		}
-		
 	}
 	
 }
