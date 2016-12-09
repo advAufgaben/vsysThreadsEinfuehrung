@@ -2,12 +2,12 @@ package synchronization;
 
 public class ThreadB extends Thread {
 	
-	Thread threadA;
+	Thread datenschreiber;
 	Ressource ressource;
 	
 	public ThreadB(Ressource ressource, Thread threadA) {
 		this.ressource = ressource;
-		this.threadA = threadA;
+		this.datenschreiber = threadA;
 	}
 	
 	@Override
@@ -15,7 +15,7 @@ public class ThreadB extends Thread {
 		System.out.println("Thread B ist gestartet");
 		System.out.println("Thread B wartet auf Thread A");
 		try {
-			threadA.join();
+			datenschreiber.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
